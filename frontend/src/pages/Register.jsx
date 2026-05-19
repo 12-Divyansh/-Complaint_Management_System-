@@ -21,7 +21,7 @@ const Register = () => {
             setAuthToken(data.token);
             navigate('/');
         } catch (err) {
-            setError(err.response?.data?.message || 'Registration failed');
+            setError(err.response?.data?.message || err.message || 'Registration failed');
         }
     };
 

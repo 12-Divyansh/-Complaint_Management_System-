@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+let API_URL = import.meta.env.VITE_API_URL || '/api';
+if (API_URL.endsWith('/')) API_URL = API_URL.slice(0, -1);
+if (!API_URL.endsWith('/api') && API_URL !== '/api') API_URL = `${API_URL}/api`;
 
 // Set Auth Token in Headers
 export const setAuthToken = (token) => {
