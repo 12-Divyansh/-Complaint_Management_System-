@@ -4,13 +4,17 @@ const {
     addComplaint,
     getComplaints,
     updateComplaintStatus,
-    searchComplaints
+    searchComplaints,
+    getComplaintStats
 } = require('../controllers/complaintController');
 const { protect } = require('../middleware/authMiddleware');
 
 router.route('/')
     .post(protect, addComplaint)
     .get(protect, getComplaints);
+
+router.route('/stats')
+    .get(protect, getComplaintStats);
 
 router.route('/search')
     .get(protect, searchComplaints);

@@ -6,6 +6,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import CreateComplaint from './pages/CreateComplaint';
+import Analytics from './pages/Analytics';
+import AICopilot from './components/AICopilot';
 import { setAuthToken } from './services/api';
 
 const ProtectedRoute = ({ children }) => {
@@ -32,8 +34,10 @@ const AppContent = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/new" element={<ProtectedRoute><CreateComplaint /></ProtectedRoute>} />
+          <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
         </Routes>
       </main>
+      <AICopilot />
     </div>
   );
 };

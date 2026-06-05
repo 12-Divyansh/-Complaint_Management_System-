@@ -29,7 +29,7 @@ const CreateComplaint = () => {
         setError('');
         setIsAnalyzing(true);
         try {
-            const result = await analyzeComplaintText(description);
+            const result = await analyzeComplaintText(formData);
             setAiData(result);
         } catch (err) {
             setError('AI Analysis failed. You can still submit manually.');
@@ -101,6 +101,21 @@ const CreateComplaint = () => {
                     {aiData && (
                         <div className="ai-suggestion-box mb-4">
                             <h4 className="flex items-center gap-2 mb-2" style={{ color: 'var(--primary)', margin: 0 }}><Sparkles size={16}/> AI Insights</h4>
+                            
+                            {aiData.is_duplicate && (
+                                <div className="duplicate-alert mb-3" style={{
+                                    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                                    border: '1px solid var(--danger)',
+                                    borderRadius: '8px',
+                                    padding: '1rem',
+                                    color: '#f87171',
+                                    fontSize: '0.9rem'
+                                }}>
+                                    <strong style={{ display: 'block', marginBottom: '0.25rem', color: '#ef4444' }}>⚠️ Possible Duplicate Detected!</strong>
+                                    <span>{aiData.duplicate_reason || 'A highly similar complaint is already registered in the system.'}</span>
+                                </div>
+                            )}
+
                             <p style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}><strong>Suggested Priority:</strong> <span className="badge badge-pending">{aiData.priority}</span></p>
                             <p style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}><strong>Department:</strong> {aiData.department}</p>
                             <p style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}><strong>Summary:</strong> <span className="text-muted">{aiData.summary}</span></p>

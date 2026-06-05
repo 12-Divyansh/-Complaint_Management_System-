@@ -34,8 +34,8 @@ export const addComplaint = async (complaintData) => {
     return response.data;
 };
 
-export const updateComplaintStatus = async (id, status) => {
-    const response = await axios.put(`${API_URL}/complaints/${id}`, { status });
+export const updateComplaintStatus = async (id, status, message = '', assignedStaff = '') => {
+    const response = await axios.put(`${API_URL}/complaints/${id}`, { status, message, assignedStaff });
     return response.data;
 };
 
@@ -44,7 +44,17 @@ export const searchComplaints = async (location) => {
     return response.data;
 };
 
-export const analyzeComplaintText = async (description) => {
-    const response = await axios.post(`${API_URL}/ai/analyze`, { description });
+export const analyzeComplaintText = async (complaintData) => {
+    const response = await axios.post(`${API_URL}/ai/analyze`, complaintData);
+    return response.data;
+};
+
+export const getComplaintStats = async () => {
+    const response = await axios.get(`${API_URL}/complaints/stats`);
+    return response.data;
+};
+
+export const chatWithAICopilot = async (messages) => {
+    const response = await axios.post(`${API_URL}/ai/chat`, { messages });
     return response.data;
 };

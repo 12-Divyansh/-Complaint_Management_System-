@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { ShieldCheck, LogOut } from 'lucide-react';
+import { ShieldCheck, LogOut, BarChart2 } from 'lucide-react';
 
 const Navbar = () => {
     const { user, logout } = useContext(AuthContext);
@@ -25,6 +25,9 @@ const Navbar = () => {
                             <span className="nav-link">Welcome, {user.name}</span>
                             {user.role === 'admin' && <span className="badge badge-resolved">Admin</span>}
                             <Link to="/" className="nav-link">Dashboard</Link>
+                            <Link to="/analytics" className="nav-link" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                <BarChart2 size={16} /> Analytics
+                            </Link>
                             <Link to="/new" className="btn btn-secondary" style={{ padding: '0.4rem 1rem' }}>+ New Complaint</Link>
                             <button className="btn" onClick={onLogout} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 1rem' }}>
                                 <LogOut size={16} /> Logout

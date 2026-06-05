@@ -31,6 +31,30 @@ const ComplaintSchema = new mongoose.Schema({
     department: {
         type: String
     },
+    assignedStaff: {
+        type: String,
+        default: ""
+    },
+    updates: [
+        {
+            status: {
+                type: String,
+                required: true
+            },
+            message: {
+                type: String,
+                required: true
+            },
+            updatedBy: {
+                type: String,
+                required: true
+            },
+            createdAt: {
+                type: Date,
+                default: Date.now
+            }
+        }
+    ],
     createdAt: {
         type: Date,
         default: Date.now

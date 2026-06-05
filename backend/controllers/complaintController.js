@@ -21,6 +21,11 @@ const addComplaint = async (req, res, next) => {
             location,
             priority: priority || "Medium",
             department: department || "General",
+            updates: [{
+                status: 'Pending',
+                message: 'Complaint submitted successfully and is awaiting review.',
+                updatedBy: req.user.name
+            }]
         });
 
         res.status(201).json(complaint);
@@ -34,11 +39,7 @@ const addComplaint = async (req, res, next) => {
 // @access  Private
 const getComplaints = async (req, res, next) => {
     try {
-        // If user is not admin, they only see their own complaints
         let query = {};
-        if (req.user.role !== 'admin') {
-            query.email = req.user.email;
-        }
 
         // Optional filtering by category
         if (req.query.category) {
@@ -57,7 +58,7 @@ const getComplaints = async (req, res, next) => {
 // @access  Private
 const updateComplaintStatus = async (req, res, next) => {
     try {
-        const { status } = req.body;
+        const { status, message, assignedStaff } = req.body;
 
         if (!status) {
             res.status(400);
@@ -75,6 +76,17 @@ const updateComplaintStatus = async (req, res, next) => {
         // For this exam, let's just let the user or admin update it for simplicity unless strictly specified
         
         complaint.status = status;
+        if (assignedStaff !== undefined) {
+            complaint.assignedStaff = assignedStaff;
+        }
+
+        const updateNote = message || `Complaint status updated to ${status}.`;
+        complaint.updates.push({
+            status: status,
+            message: updateNote,
+            updatedBy: req.user.name
+        });
+
         const updatedComplaint = await complaint.save();
 
         res.status(200).json(updatedComplaint);
@@ -96,13 +108,71 @@ const searchComplaints = async (req, res, next) => {
         }
 
         let query = { location: { $regex: location, $options: 'i' } };
-        
-        if (req.user.role !== 'admin') {
-            query.email = req.user.email;
-        }
 
         const complaints = await Complaint.find(query).sort({ createdAt: -1 });
         res.status(200).json(complaints);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Get complaint statistics
+// @route   GET /api/complaints/stats
+// @access  Private
+const getComplaintStats = async (req, res, next) => {
+    try {
+        let query = {};
+
+        const complaints = await Complaint.find(query);
+
+        const stats = {
+            totalCount: complaints.length,
+            statusCounts: {
+                Pending: 0,
+                'In Progress': 0,
+                Resolved: 0,
+                Rejected: 0
+            },
+            categoryCounts: {
+                'Water Supply': 0,
+                Electricity: 0,
+                Sanitation: 0,
+                Roads: 0,
+                General: 0
+            },
+            priorityCounts: {
+                Low: 0,
+                Medium: 0,
+                High: 0,
+                Critical: 0
+            }
+        };
+
+        complaints.forEach(c => {
+            // Count Status
+            if (stats.statusCounts[c.status] !== undefined) {
+                stats.statusCounts[c.status]++;
+            } else if (c.status) {
+                stats.statusCounts[c.status] = 1;
+            }
+
+            // Count Category
+            if (stats.categoryCounts[c.category] !== undefined) {
+                stats.categoryCounts[c.category]++;
+            } else if (c.category) {
+                stats.categoryCounts[c.category] = 1;
+            }
+
+            // Count Priority
+            const p = c.priority || 'Medium';
+            if (stats.priorityCounts[p] !== undefined) {
+                stats.priorityCounts[p]++;
+            } else {
+                stats.priorityCounts[p] = 1;
+            }
+        });
+
+        res.status(200).json(stats);
     } catch (error) {
         next(error);
     }
@@ -112,5 +182,6 @@ module.exports = {
     addComplaint,
     getComplaints,
     updateComplaintStatus,
-    searchComplaints
+    searchComplaints,
+    getComplaintStats
 };
