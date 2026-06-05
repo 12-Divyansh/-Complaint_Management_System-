@@ -58,3 +58,8 @@ export const chatWithAICopilot = async (messages) => {
     const response = await axios.post(`${API_URL}/ai/chat`, { messages });
     return response.data;
 };
+
+export const deleteComplaint = async (id) => {
+    const response = await axios.delete(`${API_URL}/complaints/${id}`);
+    return response.data;
+};

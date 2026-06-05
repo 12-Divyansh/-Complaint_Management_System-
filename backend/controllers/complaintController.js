@@ -178,10 +178,36 @@ const getComplaintStats = async (req, res, next) => {
     }
 };
 
+// @desc    Delete a complaint
+// @route   DELETE /api/complaints/:id
+// @access  Private
+const deleteComplaint = async (req, res, next) => {
+    try {
+        const complaint = await Complaint.findById(req.params.id);
+
+        if (!complaint) {
+            res.status(404);
+            throw new Error('Complaint not found');
+        }
+
+        // Check if user is admin or the owner of the complaint
+        if (req.user.role !== 'admin' && complaint.email !== req.user.email) {
+            res.status(401);
+            throw new Error('Not authorized to delete this complaint');
+        }
+
+        await complaint.deleteOne();
+        res.status(200).json({ message: 'Complaint removed successfully' });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     addComplaint,
     getComplaints,
     updateComplaintStatus,
     searchComplaints,
-    getComplaintStats
+    getComplaintStats,
+    deleteComplaint
 };

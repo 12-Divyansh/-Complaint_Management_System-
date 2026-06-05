@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
-import { getComplaints, updateComplaintStatus, searchComplaints } from '../services/api';
+import { getComplaints, updateComplaintStatus, searchComplaints, deleteComplaint } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
-import { MapPin, Clock, Tag, Building, Search, Filter, Briefcase, ChevronDown, ChevronUp } from 'lucide-react';
+import { MapPin, Clock, Tag, Building, Search, Filter, Briefcase, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 
 const Dashboard = () => {
     const [complaints, setComplaints] = useState([]);
@@ -56,6 +56,20 @@ const Dashboard = () => {
             fetchComplaints();
         } catch (error) {
             console.error(error);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (window.confirm("Are you sure you want to delete this complaint?")) {
+            try {
+                await deleteComplaint(id);
+                fetchComplaints();
+                if (expandedCardId === id) {
+                    setExpandedCardId(null);
+                }
+            } catch (error) {
+                console.error("Delete error:", error);
+            }
         }
     };
 
@@ -160,7 +174,22 @@ const Dashboard = () => {
                                 <div>
                                     <div className="flex justify-between items-start mb-3">
                                         <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-main)' }}>{complaint.title}</h3>
-                                        <span className={`badge ${getStatusBadge(complaint.status)}`}>{complaint.status}</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className={`badge ${getStatusBadge(complaint.status)}`}>{complaint.status}</span>
+                                            {(user?.role === 'admin' || complaint.email === user?.email) && (
+                                                <button 
+                                                    className="icon-btn-minimal" 
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDelete(complaint._id);
+                                                    }}
+                                                    title="Delete Complaint"
+                                                    style={{ padding: '0.2rem', color: 'var(--danger)', display: 'flex', alignItems: 'center' }}
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                     <p className="text-muted mb-4" style={{ fontSize: '0.92rem', lineHeight: '1.5' }}>{complaint.description}</p>
                                     

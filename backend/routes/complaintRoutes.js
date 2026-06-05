@@ -5,7 +5,8 @@ const {
     getComplaints,
     updateComplaintStatus,
     searchComplaints,
-    getComplaintStats
+    getComplaintStats,
+    deleteComplaint
 } = require('../controllers/complaintController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -20,6 +21,7 @@ router.route('/search')
     .get(protect, searchComplaints);
 
 router.route('/:id')
-    .put(protect, updateComplaintStatus);
+    .put(protect, updateComplaintStatus)
+    .delete(protect, deleteComplaint);
 
 module.exports = router;
